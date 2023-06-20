@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-6 ms-auto container">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="">SingUp</h2>
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-danger text-center" role="alert">
+                            <p>{{ message }}</p>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    <form action="{% url 'singup' %}" method="post" class="form-singup">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button class="btn btn-success" type="submit">Entrar</button>
+                    </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
