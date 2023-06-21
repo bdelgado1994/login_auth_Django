@@ -1,0 +1,12 @@
+{% extends 'base.html' %} {% block content %}
+<h1>Create Task</h1>
+{% if messages %} {% for message in messages %}
+<div class="alert alert-danger text-center" role="alert">
+  <p>{{ message }}</p>
+</div>
+{% endfor %} {% endif %}
+<form action="{% url 'create_task' %}" method="POST">
+  {% csrf_token %} {{ form.as_p }}
+  <button class="btn btn-success" type="submit">Save</button>
+</form>
+{% endblock content %}

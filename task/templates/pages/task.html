@@ -1,5 +1,23 @@
-
-{% extends 'base.html' %}
-{% block content %}
-<h1>Soy Una Tarea</h1>
-{% endblock content %}
+{% extends 'base.html' %} {% block content %}
+<h1>Task List</h1>
+<div class="row">
+{% if user.is_authenticated %}
+{% for task in tasks %}
+<div class="col-md-4 mb-4">    
+    <div class="card">
+      <div class="card-header">Created at {{task.created_at|date:"d-m-Y" }}</div>
+      <div class="card-body">
+        <h4 class="card-title">{{ task.title }}</h4>
+        <p class="card-text">{{ task.description }}</p>
+      </div>
+      <div class="card-footer text-muted">By {{ task.user.username }}</div>
+    </div>
+    
+</div>
+{% endfor %}
+{% else %}
+<h3>Debes Iniciar Session para ver tus tareas</h3>
+<a class="btn btn-primary" href="{% url 'login' %}">Iniciar Session</a>
+{% endif %}
+</div>
+ {% endblock content %}
