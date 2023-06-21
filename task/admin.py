@@ -7,4 +7,4 @@ class TaskAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at",)
 
 
-admin.site.register(Task,TaskAdmin)
+admin.site.register(Task, TaskAdmin)

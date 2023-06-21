@@ -55,29 +55,31 @@ def singin(request):
 # close session method
 def close_session(request):
     logout(request)
-    return redirect("task")
+    return redirect("home")
 
 
 # Method to call Task Page
 def task_page(request):
-    task = Task.objects.filter(user=request.user, datecompleted__isnull=True).order_by(
-        "-created_at"
-    )
-    print(task)
-    return render(request, "pages/task.html", {"tasks": task})
+    if request.user.is_authenticated:
+        tasks = Task.objects.filter(
+            user=request.user, datecompleted__isnull=False
+        ).order_by("-datecompleted")
+        return render(request, "pages/task.html", {"tasks": tasks})
+    else:
+        return render(request, "pages/task.html")
 
 
 # In this Method or function you can create a new task
 def create_task(request):
-    context = {"form": TaskForm}
     if request.method == "GET":
-        return render(request, "pages/create_task.html", context)
+        return render(request, "pages/create_task.html", {"form": TaskForm})
     else:
         try:
             form = TaskForm(request.POST)
             new_task = form.save(commit=False)
             new_task.user = request.user
             new_task.save()
+            print(new_task)
             return redirect("task")
         except Exception as ex:
             messages.error(request, "Coudn't create a new task please try again")
