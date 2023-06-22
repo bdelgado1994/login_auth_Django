@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import IntegrityError
@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from .form import TaskForm
 from .models import Task
+from django.utils import timezone
 
 
 # Method for create a new User
@@ -61,14 +62,34 @@ def close_session(request):
 # Method to call Task Page
 def task_page(request):
     if request.user.is_authenticated:
-        tasks = Task.objects.filter(
-            user=request.user, datecompleted__isnull=False
-        ).order_by("-datecompleted")
+        tasks = Task.objects.filter(user=request.user,datecompleted__isnull=True).order_by(
+            "-datecompleted"
+        )  
         return render(request, "pages/task.html", {"tasks": tasks})
     else:
         return render(request, "pages/task.html")
 
 
+# This page show you a specific task
+def task_detail(request, id_task):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            task = get_object_or_404(Task, id=id_task, user=request.user)
+            form = TaskForm(instance=task)
+            return render(
+                request, "pages/task_details.html", {"task": task, "form": form}
+            )
+        else:
+            return redirect('task')
+    else:
+        task = get_object_or_404(Task, id=id_task, user=request.user)
+        if request.POST.get("datecompleted",None):
+            task.datecompleted = timezone.now()
+        else:
+            task.datecompleted=None
+        form = TaskForm(request.POST, instance=task)
+        form.save()
+        return redirect('task')
 # In this Method or function you can create a new task
 def create_task(request):
     if request.method == "GET":
@@ -79,12 +100,15 @@ def create_task(request):
             new_task = form.save(commit=False)
             new_task.user = request.user
             new_task.save()
-            print(new_task)
             return redirect("task")
         except Exception as ex:
             messages.error(request, "Coudn't create a new task please try again")
             return redirect("create_task")
-
+#This Method Delete a Task
+def delete_task(request,id_task):
+    task = get_object_or_404(Task, id=id_task, user=request.user)
+    task.delete()
+    return redirect('task')
 
 # This is our HomePage
 def home(request):

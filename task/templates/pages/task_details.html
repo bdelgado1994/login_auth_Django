@@ -1,0 +1,19 @@
+{% extends 'base.html' %} {% block content %}
+<div class="p-5 mb-4 bg-light rounded-3">
+  <div class="card">
+    <div class="card-header">Created at {{task.created_at| date:"d-m-Y" }}</div>
+    <div class="card-body">
+      <h4 class="card-title">{{task.title}}</h4>
+      <p class="card-text">{{task.description}}</p>
+    </div>
+    <div class="card-footer text-muted">
+        <p>By {{ task.user.username }}</p>
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-success mx-5" data-bs-toggle="modal" data-bs-target="#exampleModal">Editar</button>
+            <a class="btn btn-danger" href="{% url 'delete_task' task.id %}">Eliminar</a>
+        </div>
+    </div>
+  </div>
+<!-- Modal -->
+{% include 'partials/modal_task.html' %}
+{% endblock content %}
