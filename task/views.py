@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from .form import TaskForm
 from .models import Task
+from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
 
@@ -91,6 +92,7 @@ def task_detail(request, id_task):
         form.save()
         return redirect('task')
 # In this Method or function you can create a new task
+@login_required
 def create_task(request):
     if request.method == "GET":
         return render(request, "pages/create_task.html", {"form": TaskForm})
@@ -105,10 +107,20 @@ def create_task(request):
             messages.error(request, "Coudn't create a new task please try again")
             return redirect("create_task")
 #This Method Delete a Task
+@login_required
 def delete_task(request,id_task):
     task = get_object_or_404(Task, id=id_task, user=request.user)
     task.delete()
     return redirect('task')
+#This metohd show you all tasks completed
+def tasks_completed(request):
+    if request.user.is_authenticated:
+        tasks = Task.objects.filter(user=request.user,datecompleted__isnull=False).order_by(
+            "-datecompleted"
+        )  
+        return render(request, "pages/tasks_completed.html", {"tasks": tasks})
+    else:
+        return render(request,"pages/tasks_completed.html")
 
 # This is our HomePage
 def home(request):
